@@ -1,0 +1,50 @@
+name: Build 前后双摄 IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 XcodeGen
+        run: brew install xcodegen
+
+      - name: 生成 Xcode 工程
+        run: xcodegen generate --spec project.yml
+
+      - name: 编译未签名 App
+        run: |
+          xcodebuild \
+            -project DualCam.xcodeproj \
+            -scheme DualCam \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ./build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            clean build
+
+      - name: 打包成 IPA
+        run: |
+          APP_PATH=$(find ./build/Build/Products/Release-iphoneos -maxdepth 1 -name "DualCam.app" -type d)
+          echo "找到 App: $APP_PATH"
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -qry DualCam.ipa Payload
+          ls -lh DualCam.ipa
+
+      - name: 上传 IPA 安装包
+        uses: actions/upload-artifact@v4
+        with:
+          name: DualCam-IPA
+          path: DualCam.ipa
+          if-no-files-found: error
+          retention-days: 30
