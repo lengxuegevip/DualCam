@@ -281,15 +281,14 @@ final class ViewController: UIViewController {
     }
 
     private func selectModerateFormat(for device: AVCaptureDevice) {
-        let candidates = device.formats.filter { $0.videoDimensions.width <= 1280 }
-        guard let format = candidates.max(by: { $0.videoDimensions.width < $1.videoDimensions.width }) else { return }
+        // 多摄会话固定使用 .inputPriority 预设，由系统自动在两路摄像头之间分配硬件资源。
+        // 这里不手动指定 activeFormat，避免不同 iOS SDK 之间格式 API 的兼容差异。
         do {
             try device.lockForConfiguration()
-            device.activeFormat = format
             if device.isExposureModeSupported(.continuousAutoExposure) { device.exposureMode = .continuousAutoExposure }
             if device.isFocusModeSupported(.continuousAutoFocus) { device.focusMode = .continuousAutoFocus }
             device.unlockForConfiguration()
-        } catch { /* 使用系统默认格式 */ }
+        } catch { /* 使用系统默认配置 */ }
     }
 
     private func startSession() {
