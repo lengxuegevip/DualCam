@@ -1,0 +1,37 @@
+name: DualCam
+
+options:
+  bundleIdPrefix: com.dualcam.sidebyside
+  deploymentTarget:
+    iOS: "14.0"
+  projectVersion: "1.0"
+  createIntermediateGroups: true
+
+settings:
+  SWIFT_VERSION: "5.0"
+  SUPPORTED_PLATFORMS: iphoneos
+  TARGETED_DEVICE_FAMILY: "1,2"
+  CODE_SIGN_STYLE: Manual
+
+targets:
+  DualCam:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    settings:
+      PRODUCT_NAME: DualCam
+      PRODUCT_BUNDLE_IDENTIFIER: com.dualcam.sidebyside.app
+      IPHONEOS_DEPLOYMENT_TARGET: "14.0"
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: 双摄同屏
+        CFBundleName: DualCam
+        NSCameraUsageDescription: 需要同时使用前后摄像头，实现双摄同屏预览与拍照
+        NSPhotoLibraryAddUsageDescription: 需要将前后摄像头拍摄的照片保存到相册
+        UILaunchScreen: {}
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
